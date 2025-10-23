@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Hero Section -->
+<section id="home" class="hero">
+    <div class="hero-content">
+        <h1 class="hero-title">{{ settings.hero_title }}</h1>
+        <p class="hero-subtitle">{{ settings.hero_subtitle }}</p>
+        <div class="hero-buttons">
+            <a href="#portfolio" class="btn btn-primary">View Portfolio</a>
+            <a href="#contact" class="btn btn-secondary">Get In Touch</a>
+        </div>
+    </div>
+    <div class="hero-image">
+        {% if portfolio.images %}
+            <img src="{{ url_for('uploaded_file', filename=portfolio.images[0].filename) }}" alt="Photography Hero">
+        {% else %}
+            <img src="https://images.unsplash.com/photo-1606983340126-99ab4feaa64a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1926&q=80" alt="Photography Hero">
+        {% endif %}
+    </div>
+</section>
+
+<!-- About Section -->
+<section id="about" class="about">
+    <div class="container">
+        <div class="about-content">
+            <div class="about-text">
+                <h2>About Me</h2>
+                <p>{{ settings.about_text }}</p>
+                <p>Specializing in wedding photography, portrait sessions, and commercial work, I believe every moment has a story worth telling. My approach combines technical expertise with artistic vision to deliver photographs that are not just beautiful, but meaningful.</p>
+                <div class="stats">
+                    <div class="stat">
+                        <h3>500+</h3>
+                        <p>Happy Clients</p>
+                    </div>
+                    <div class="stat">
+                        <h3>8+</h3>
+                        <p>Years Experience</p>
+                    </div>
+                    <div class="stat">
+                        <h3>{{ portfolio.images|length }}+</h3>
+                        <p>Photos in Portfolio</p>
+                    </div>
+                </div>
+            </div>
+            <div class="about-image">
+                {% if portfolio.images|length > 1 %}
+                    <img src="{{ url_for('uploaded_file', filename=portfolio.images[1].filename) }}" alt="Photographer">
+                {% else %}
+                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Photographer">
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Portfolio Section -->
+<section id="portfolio" class="portfolio">
+    <div class="container">
+        <h2 class="section-title">Portfolio</h2>
+        <div class="portfolio-filters">
+            <button class="filter-btn active" data-filter="all">All</button>
+            {% for category in portfolio.categories %}
+            <button class="filter-btn" data-filter="{{ category }}">{{ category.title() }}</button>
+            {% endfor %}
+        </div>
+        <div class="portfolio-grid">
+            {% for image in portfolio.images %}
+            <div class="portfolio-item" data-category="{{ image.category }}">
+                <img src="{{ url_for('uploaded_file', filename=image.filename) }}" alt="{{ image.title }}">
+                <div class="portfolio-overlay">
+                    <h3>{{ image.title or 'Untitled' }}</h3>
+                    <p>{{ image.description or 'Beautiful photography' }}</p>
+                </div>
+            </div>
+            {% endfor %}
+            
+            {% if not portfolio.images %}
+            <div class="no-images">
+                <p>No images uploaded yet. <a href="/admin">Login to admin panel</a> to add images.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!-- Services Section -->
+<section id="services" class="services">
+    <div class="container">
+        <h2 class="section-title">Services</h2>
+        <div class="services-grid">
+            <div class="service-card">
+                <div class="service-icon">
+                    <i class="fas fa-heart"></i>
+                </div>
+                <h3>Wedding Photography</h3>
+                <p>Capture your special day with beautiful, timeless wedding photography that tells your unique love story.</p>
+                <ul>
+                    <li>Full day coverage</li>
+                    <li>Engagement session</li>
+                    <li>Online gallery</li>
+                    <li>High-resolution images</li>
+                </ul>
+            </div>
+            <div class="service-card">
+                <div class="service-icon">
+                    <i class="fas fa-user"></i>
+                </div>
+                <h3>Portrait Sessions</h3>
+                <p>Professional portrait photography for individuals, families, and corporate headshots.</p>
+                <ul>
+                    <li>Studio or location</li>
+                    <li>Professional editing</li>
+                    <li>Multiple outfit changes</li>
+                    <li>Digital delivery</li>
+                </ul>
+            </div>
+            <div class="service-card">
+                <div class="service-icon">
+                    <i class="fas fa-calendar"></i>
+                </div>
+                <h3>Event Photography</h3>
+                <p>Document your special events, corporate functions, and celebrations with professional coverage.</p>
+                <ul>
+                    <li>Corporate events</li>
+                    <li>Birthday parties</li>
+                    <li>Anniversaries</li>
+                    <li>Social gatherings</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Contact Section -->
+<section id="contact" class="contact">
+    <div class="container">
+        <h2 class="section-title">Get In Touch</h2>
+        <div class="contact-content">
+            <div class="contact-info">
+                <h3>Let's Create Something Beautiful Together</h3>
+                <p>Ready to capture your special moments? I'd love to hear about your photography needs and discuss how we can bring your vision to life.</p>
+                <div class="contact-details">
+                    <div class="contact-item">
+                        <i class="fas fa-phone"></i>
+                        <span>{{ settings.contact_phone }}</span>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-envelope"></i>
+                        <span>{{ settings.contact_email }}</span>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>New York, NY</span>
+                    </div>
+                </div>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-linkedin"></i></a>
+                </div>
+            </div>
+            <form class="contact-form" id="contactForm">
+                <div class="form-group">
+                    <input type="text" name="name" placeholder="Your Name" required>
+                </div>
+                <div class="form-group">
+                    <input type="email" name="email" placeholder="Your Email" required>
+                </div>
+                <div class="form-group">
+                    <input type="text" name="subject" placeholder="Subject" required>
+                </div>
+                <div class="form-group">
+                    <textarea name="message" placeholder="Your Message" rows="5" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Send Message</button>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}
