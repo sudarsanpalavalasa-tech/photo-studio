@@ -18,6 +18,11 @@ class AccessControl {
         // Protect image uploads
         this.protectImageUploads();
     }
+    
+    // Public method to check if current user is the owner
+    isOwner() {
+        return this.isAdmin;
+    }
 
     checkAuthStatus() {
         const authData = localStorage.getItem('photography_auth');
