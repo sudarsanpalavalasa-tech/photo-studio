@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Photography Website - Admin Panel</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .admin-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 40px;
+            width: 90%;
+            max-width: 800px;
+        }
+
+        .admin-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .admin-header h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .admin-header p {
+            color: #666;
+        }
+
+        .login-section {
+            display: block;
+        }
+
+        .admin-panel {
+            display: none;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e8ed;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #e74c3c;
+        }
+
+        .btn {
+            background: #e74c3c;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .btn:hover {
+            background: #c0392b;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #95a5a6;
+        }
+
+        .btn-secondary:hover {
+            background: #7f8c8d;
+        }
+
+        .image-upload-area {
+            border: 3px dashed #e74c3c;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            background: #fafafa;
+            margin: 20px 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .image-upload-area:hover {
+            border-color: #c0392b;
+            background: #f0f0f0;
+        }
+
+        .image-upload-area.dragover {
+            border-color: #27ae60;
+            background: #e8f5e8;
+        }
+
+        .image-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .image-item {
+            position: relative;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .image-item img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+        }
+
+        .image-info {
+            padding: 10px;
+            background: #f8f9fa;
+        }
+
+        .image-info h4 {
+            margin: 0 0 5px 0;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .image-info p {
+            margin: 0;
+            color: #666;
+            font-size: 12px;
+        }
+
+        .remove-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .status-message {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            display: none;
+        }
+
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .admin-nav {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .nav-btn {
+            flex: 1;
+            padding: 10px;
+            background: #ecf0f1;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn.active {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        .logout-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #95a5a6;
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .logout-btn:hover {
+            background: #7f8c8d;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Login Section -->
+        <div class="login-section" id="loginSection">
+            <div class="admin-header">
+                <h1>🔐 Admin Access</h1>
+                <p>Photography Website Management</p>
+            </div>
+
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="username">Username:</label>
+                    <input type="text" id="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" required>
+                </div>
+                <button type="submit" class="btn">Login</button>
+            </form>
+
+            <div class="status-message" id="loginStatus"></div>
+        </div>
+
+        <!-- Admin Panel -->
+        <div class="admin-panel" id="adminPanel">
+            <button class="logout-btn" onclick="logout()">Logout</button>
+            
+            <div class="admin-header">
+                <h1>📸 Image Management</h1>
+                <p>Add, edit, and manage your photography portfolio</p>
+            </div>
+
+            <div class="admin-nav">
+                <button class="nav-btn active" onclick="showSection('upload')">Upload Images</button>
+                <button class="nav-btn" onclick="showSection('manage')">Manage Images</button>
+                <button class="nav-btn" onclick="showSection('settings')">Settings</button>
+            </div>
+
+            <!-- Upload Section -->
+            <div class="section active" id="uploadSection">
+                <h3>Upload New Images</h3>
+                <div class="image-upload-area" id="uploadArea">
+                    <p>📁 Drag & Drop your images here</p>
+                    <p>or</p>
+                    <input type="file" id="fileInput" multiple accept="image/*" style="display: none;">
+                    <button class="btn" onclick="document.getElementById('fileInput').click()">
+                        Choose Images
+                    </button>
+                </div>
+                <div class="image-grid" id="uploadPreview"></div>
+                <button class="btn" onclick="uploadImages()">Upload to Website</button>
+            </div>
+
+            <!-- Manage Section -->
+            <div class="section" id="manageSection">
+                <h3>Current Website Images</h3>
+                <div class="image-grid" id="currentImages">
+                    <!-- Current images will be loaded here -->
+                </div>
+                <button class="btn btn-secondary" onclick="refreshImages()">Refresh List</button>
+            </div>
+
+            <!-- Settings Section -->
+            <div class="section" id="settingsSection">
+                <h3>Website Settings</h3>
+                <div class="form-group">
+                    <label for="photographerName">Photographer Name:</label>
+                    <input type="text" id="photographerName" value="PhotoStudio">
+                </div>
+                <div class="form-group">
+                    <label for="contactEmail">Contact Email:</label>
+                    <input type="email" id="contactEmail" value="hello@photostudio.com">
+                </div>
+                <div class="form-group">
+                    <label for="contactPhone">Contact Phone:</label>
+                    <input type="tel" id="contactPhone" value="+1 (555) 123-4567">
+                </div>
+                <button class="btn" onclick="updateSettings()">Update Settings</button>
+            </div>
+
+            <div class="status-message" id="adminStatus"></div>
+        </div>
+    </div>
+
+    <script>
+        // Simple authentication (in real app, use proper backend)
+        const ADMIN_CREDENTIALS = {
+            username: 'admin',
+            password: 'photography2024'
+        };
+
+        let uploadedFiles = [];
+        let currentImages = [];
+
+        // Login functionality
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            if (username === ADMIN_CREDENTIALS.username && password === ADMIN_CREDENTIALS.password) {
+                showAdminPanel();
+                showStatus('Login successful!', 'success');
+            } else {
+                showStatus('Invalid credentials!', 'error');
+            }
+        });
+
+        function showAdminPanel() {
+            document.getElementById('loginSection').style.display = 'none';
+            document.getElementById('adminPanel').style.display = 'block';
+            loadCurrentImages();
+        }
+
+        function logout() {
+            document.getElementById('loginSection').style.display = 'block';
+            document.getElementById('adminPanel').style.display = 'none';
+            document.getElementById('loginForm').reset();
+        }
+
+        function showSection(sectionName) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Remove active from all nav buttons
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(sectionName + 'Section').classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // File upload functionality
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = Array.from(e.dataTransfer.files);
+            handleFiles(files);
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            const files = Array.from(e.target.files);
+            handleFiles(files);
+        });
+
+        function handleFiles(files) {
+            files.forEach(file => {
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const imageData = {
+                            file: file,
+                            dataUrl: e.target.result,
+                            id: Date.now() + Math.random()
+                        };
+                        uploadedFiles.push(imageData);
+                        displayUploadPreview(imageData);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+
+        function displayUploadPreview(imageData) {
+            const previewItem = document.createElement('div');
+            previewItem.className = 'image-item';
+            previewItem.innerHTML = `
+                <img src="${imageData.dataUrl}" alt="Preview">
+                <div class="image-info">
+                    <h4>${imageData.file.name}</h4>
+                    <p>Size: ${(imageData.file.size / 1024 / 1024).toFixed(2)} MB</p>
+                </div>
+                <button class="remove-btn" onclick="removeUploadedImage('${imageData.id}')">×</button>
+            `;
+            document.getElementById('uploadPreview').appendChild(previewItem);
+        }
+
+        function removeUploadedImage(id) {
+            uploadedFiles = uploadedFiles.filter(img => img.id != id);
+            document.querySelector(`[onclick="removeUploadedImage('${id}')"]`).parentElement.remove();
+        }
+
+        function uploadImages() {
+            if (uploadedFiles.length === 0) {
+                showStatus('Please select images to upload!', 'error');
+                return;
+            }
+
+            // Simulate upload process
+            showStatus('Uploading images...', 'success');
+            
+            // In a real application, you would upload to a server here
+            setTimeout(() => {
+                showStatus('Images uploaded successfully!', 'success');
+                uploadedFiles = [];
+                document.getElementById('uploadPreview').innerHTML = '';
+            }, 2000);
+        }
+
+        function loadCurrentImages() {
+            // Simulate loading current images
+            const sampleImages = [
+                { name: 'hero-photo.jpg', category: 'Hero' },
+                { name: 'photographer-about.jpg', category: 'About' },
+                { name: 'wedding-1.jpg', category: 'Wedding' },
+                { name: 'portrait-1.jpg', category: 'Portrait' }
+            ];
+
+            const container = document.getElementById('currentImages');
+            container.innerHTML = '';
+
+            sampleImages.forEach(img => {
+                const imageItem = document.createElement('div');
+                imageItem.className = 'image-item';
+                imageItem.innerHTML = `
+                    <img src="images/${img.name}" alt="${img.name}" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjE1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPk5vIEltYWdlPC90ZXh0Pjwvc3ZnPg=='">
+                    <div class="image-info">
+                        <h4>${img.name}</h4>
+                        <p>Category: ${img.category}</p>
+                    </div>
+                    <button class="remove-btn" onclick="removeImage('${img.name}')">×</button>
+                `;
+                container.appendChild(imageItem);
+            });
+        }
+
+        function removeImage(filename) {
+            if (confirm(`Are you sure you want to remove ${filename}?`)) {
+                showStatus(`Removed ${filename}`, 'success');
+                loadCurrentImages(); // Refresh the list
+            }
+        }
+
+        function refreshImages() {
+            loadCurrentImages();
+            showStatus('Image list refreshed!', 'success');
+        }
+
+        function updateSettings() {
+            const name = document.getElementById('photographerName').value;
+            const email = document.getElementById('contactEmail').value;
+            const phone = document.getElementById('contactPhone').value;
+            
+            showStatus('Settings updated successfully!', 'success');
+        }
+
+        function showStatus(message, type) {
+            const status = document.getElementById('adminStatus');
+            status.textContent = message;
+            status.className = `status-message status-${type}`;
+            status.style.display = 'block';
+            
+            setTimeout(() => {
+                status.style.display = 'none';
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
